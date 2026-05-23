@@ -11,9 +11,9 @@ const MapClient = dynamic(() => import('./MapClient'), { ssr: false })
 
 type City = 'nyc' | 'sf'
 
-const QUICK_OFFICES: Array<{ label: string; city: City; address: string }> = [
-  { label: '505 Howard (SoMa)', city: 'sf', address: '505 Howard St, San Francisco, CA' },
-  { label: 'ZS Associates (South SF)', city: 'sf', address: '611 Gateway Blvd, South San Francisco, CA' },
+const QUICK_OFFICES: Array<{ label: string; city: City; address: string; lat?: number; lng?: number }> = [
+  { label: 'Intuit (SF)', city: 'sf', address: '505 Howard St, San Francisco, CA' },
+  { label: 'ZS Associates (South SF)', city: 'sf', address: '611 Gateway Blvd, South San Francisco, CA', lat: 37.6557, lng: -122.4019 },
   { label: 'Intuit (Mountain View)', city: 'sf', address: '2700 Coast Ave, Mountain View, CA' },
 ]
 
@@ -217,14 +217,38 @@ export default function AppClient() {
     await triggerGeocode(workAddress, city)
   }
 
-  async function selectOffice(address: string, targetCity: City) {
+  async function selectOffice(address: string, targetCity: City, lat?: number, lng?: number) {
     // Fill the address input for that city
     if (targetCity === 'nyc') setNycAddress(address)
     else setSfAddress(address)
     // Switch city tab if needed (triggers a reset, but triggerGeocode below overwrites it)
     if (targetCity !== city) setCity(targetCity)
-    // Immediately geocode so the user doesn't have to click Update
-    await triggerGeocode(address, targetCity)
+
+    if (lat !== undefined && lng !== undefined) {
+      // Skip geocoding — use hardcoded coordinates directly
+      setError(null)
+      setGeocoding(true)
+      const cfg = CITY_CONFIG[targetCity]
+      try {
+        await axios.post(cfg.commutesEndpoint, {
+          workAddress: address, workLat: lat, workLon: lng, departureTime, arriveBy,
+        })
+        setWorkLocation({ lat, lng, displayName: address })
+        setActiveWorkAddress(address)
+        setActiveDepartureTime(departureTime)
+        setActiveArriveBy(arriveBy)
+      } catch {
+        // commutes warming failed — still show cached results
+        setWorkLocation({ lat, lng, displayName: address })
+        setActiveWorkAddress(address)
+        setActiveDepartureTime(departureTime)
+        setActiveArriveBy(arriveBy)
+      } finally {
+        setGeocoding(false)
+      }
+    } else {
+      await triggerGeocode(address, targetCity)
+    }
   }
 
   return (
@@ -305,7 +329,7 @@ export default function AppClient() {
               <button
                 key={o.label}
                 type="button"
-                onClick={() => selectOffice(o.address, o.city)}
+                onClick={() => selectOffice(o.address, o.city, o.lat, o.lng)}
                 disabled={geocoding}
                 style={{
                   fontSize: 11,
