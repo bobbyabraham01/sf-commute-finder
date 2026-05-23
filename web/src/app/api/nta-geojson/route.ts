@@ -6,6 +6,7 @@ export const runtime = 'nodejs'
 
 export async function GET() {
   const candidatePaths = [
+    path.join(process.cwd(), 'public', 'data', 'nta.geojson'),
     path.join(process.cwd(), 'server', 'data', 'nta.geojson'),
     path.join(process.cwd(), '..', 'server', 'data', 'nta.geojson'),
   ]
