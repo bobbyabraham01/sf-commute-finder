@@ -126,14 +126,18 @@ function NeighborhoodDetail({ n }: { n: Neighborhood }) {
 }
 
 function TransitCell({ n }: { n: Neighborhood }) {
-  const isCarOnly = (n.legs?.carMinutes ?? 0) > 0
+  const carMins = n.legs?.carMinutes ?? 0
   const walkMins = n.legs?.walkMinutes ?? 0
+  // Only label as "Drive only" for genuinely car-dependent areas (outside SF proper)
+  // In-city SF neighborhoods always have transit — carMinutes here means OTP failed, not that transit doesn't exist
+  const isUrbanSF = n.ntaCode.startsWith('SF-')
+  const isCarOnly = carMins > 0 && !isUrbanSF
   const heavyWalk = !isCarOnly && walkMins > 30
 
   if (isCarOnly) {
     return (
       <td style={{ color: '#888', fontSize: 13 }}>
-        <span title="No practical transit found">🚗 Drive only</span>
+        <span title="No practical transit found — driving recommended">🚗 Drive only</span>
       </td>
     )
   }
