@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import ntaData from '../../../../public/data/nta.geojson'
+import ntaData from '../../../../public/data/nta.json'
 
 export const runtime = 'nodejs'
 
