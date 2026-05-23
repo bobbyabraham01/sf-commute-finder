@@ -4,8 +4,9 @@ import path from 'path'
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname, '..'),
   reactStrictMode: false,
-  outputFileTracingIncludes: {
-    '/api/nta-geojson': ['./public/data/nta.geojson'],
+  webpack: (config) => {
+    config.module.rules.push({ test: /\.geojson$/, type: 'json' })
+    return config
   },
 }
 
