@@ -17,7 +17,7 @@ const OTP_BATCH_SIZE = 10
 const SF_CACHE_VERSION = 'sf-v3'
 const WALKING_MPH = 3
 const SHORT_DISTANCE_WALK_ONLY_MILES = 1.0
-const LONG_WALK_THRESHOLD_MINUTES = 20
+const LONG_WALK_THRESHOLD_MINUTES = 40
 
 /**
  * Rough driving time estimate based on straight-line distance.
