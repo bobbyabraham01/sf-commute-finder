@@ -955,10 +955,12 @@ export function mergeSFNeighborhoodsWithCommutes(
 ): Neighborhood[] {
   return SF_NEIGHBORHOODS.map((n) => {
     const result = commuteByNtaCode.get(n.ntaCode)
+    const d = distMiles(workLat, workLng, n.centroid[1], n.centroid[0])
     return {
       ...n,
       commuteMinutes:
         result?.minutes ?? mockCommute(workLat, workLng, n.centroid[1], n.centroid[0], n.name),
+      driveMinutes: estimateDriveMinutes(d),
       legs: result?.legs,
     }
   })

@@ -13,6 +13,7 @@ export interface Neighborhood {
   borough: string
   centroid: [number, number]
   commuteMinutes: number
+  driveMinutes?: number
   medianRent: number
   legs?: LegSummary
   safetyRating?: number   // 1–5 (1=high crime, 5=very safe) — SF only for now
